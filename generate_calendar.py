@@ -3,7 +3,28 @@
 
 import calendar
 from datetime import date, timedelta
-from pathlib import Path
+
+
+def add_crop_marks(svg_parts: list[str], bleed: float, total_width: float, total_height: float,
+                   border_color: str) -> None:
+    """Add crop marks around the printable page."""
+    if bleed <= 0:
+        return
+
+    crop_mark_length = 10
+    crop_mark_offset = 5
+    # Top-left
+    svg_parts.append(f'<line x1="{bleed - crop_mark_offset}" y1="{bleed}" x2="{bleed - crop_mark_offset - crop_mark_length}" y2="{bleed}" stroke="{border_color}" stroke-width="0.5"/>')
+    svg_parts.append(f'<line x1="{bleed}" y1="{bleed - crop_mark_offset}" x2="{bleed}" y2="{bleed - crop_mark_offset - crop_mark_length}" stroke="{border_color}" stroke-width="0.5"/>')
+    # Top-right
+    svg_parts.append(f'<line x1="{total_width - bleed + crop_mark_offset}" y1="{bleed}" x2="{total_width - bleed + crop_mark_offset + crop_mark_length}" y2="{bleed}" stroke="{border_color}" stroke-width="0.5"/>')
+    svg_parts.append(f'<line x1="{total_width - bleed}" y1="{bleed - crop_mark_offset}" x2="{total_width - bleed}" y2="{bleed - crop_mark_offset - crop_mark_length}" stroke="{border_color}" stroke-width="0.5"/>')
+    # Bottom-left
+    svg_parts.append(f'<line x1="{bleed - crop_mark_offset}" y1="{total_height - bleed}" x2="{bleed - crop_mark_offset - crop_mark_length}" y2="{total_height - bleed}" stroke="{border_color}" stroke-width="0.5"/>')
+    svg_parts.append(f'<line x1="{bleed}" y1="{total_height - bleed + crop_mark_offset}" x2="{bleed}" y2="{total_height - bleed + crop_mark_offset + crop_mark_length}" stroke="{border_color}" stroke-width="0.5"/>')
+    # Bottom-right
+    svg_parts.append(f'<line x1="{total_width - bleed + crop_mark_offset}" y1="{total_height - bleed}" x2="{total_width - bleed + crop_mark_offset + crop_mark_length}" y2="{total_height - bleed}" stroke="{border_color}" stroke-width="0.5"/>')
+    svg_parts.append(f'<line x1="{total_width - bleed}" y1="{total_height - bleed + crop_mark_offset}" x2="{total_width - bleed}" y2="{total_height - bleed + crop_mark_offset + crop_mark_length}" stroke="{border_color}" stroke-width="0.5"/>')
 
 
 def generate_calendar_svg_grid(year: int, page_width: float = None, page_height: float = None,
@@ -146,22 +167,7 @@ def generate_calendar_svg_grid(year: int, page_width: float = None, page_height:
         # Move to next month row
         y_pos += cell_height
 
-    # Add crop marks if there's bleed
-    if bleed > 0:
-        crop_mark_length = 10
-        crop_mark_offset = 5
-        # Top-left
-        svg_parts.append(f'<line x1="{bleed - crop_mark_offset}" y1="{bleed}" x2="{bleed - crop_mark_offset - crop_mark_length}" y2="{bleed}" stroke="{border_color}" stroke-width="0.5"/>')
-        svg_parts.append(f'<line x1="{bleed}" y1="{bleed - crop_mark_offset}" x2="{bleed}" y2="{bleed - crop_mark_offset - crop_mark_length}" stroke="{border_color}" stroke-width="0.5"/>')
-        # Top-right
-        svg_parts.append(f'<line x1="{total_width - bleed + crop_mark_offset}" y1="{bleed}" x2="{total_width - bleed + crop_mark_offset + crop_mark_length}" y2="{bleed}" stroke="{border_color}" stroke-width="0.5"/>')
-        svg_parts.append(f'<line x1="{total_width - bleed}" y1="{bleed - crop_mark_offset}" x2="{total_width - bleed}" y2="{bleed - crop_mark_offset - crop_mark_length}" stroke="{border_color}" stroke-width="0.5"/>')
-        # Bottom-left
-        svg_parts.append(f'<line x1="{bleed - crop_mark_offset}" y1="{total_height - bleed}" x2="{bleed - crop_mark_offset - crop_mark_length}" y2="{total_height - bleed}" stroke="{border_color}" stroke-width="0.5"/>')
-        svg_parts.append(f'<line x1="{bleed}" y1="{total_height - bleed + crop_mark_offset}" x2="{bleed}" y2="{total_height - bleed + crop_mark_offset + crop_mark_length}" stroke="{border_color}" stroke-width="0.5"/>')
-        # Bottom-right
-        svg_parts.append(f'<line x1="{total_width - bleed + crop_mark_offset}" y1="{total_height - bleed}" x2="{total_width - bleed + crop_mark_offset + crop_mark_length}" y2="{total_height - bleed}" stroke="{border_color}" stroke-width="0.5"/>')
-        svg_parts.append(f'<line x1="{total_width - bleed}" y1="{total_height - bleed + crop_mark_offset}" x2="{total_width - bleed}" y2="{total_height - bleed + crop_mark_offset + crop_mark_length}" stroke="{border_color}" stroke-width="0.5"/>')
+    add_crop_marks(svg_parts, bleed, total_width, total_height, border_color)
 
     # Build complete SVG
     svg = f'''<?xml version="1.0" encoding="UTF-8"?>
@@ -352,24 +358,149 @@ def generate_calendar_svg(year: int, page_width: float = None, page_height: floa
         # Move to next month row
         y_pos += cell_height
 
-    # Add crop marks if there's bleed
-    if bleed > 0:
-        crop_mark_length = 10
-        crop_mark_offset = 5
-        # Top-left
-        svg_parts.append(f'<line x1="{bleed - crop_mark_offset}" y1="{bleed}" x2="{bleed - crop_mark_offset - crop_mark_length}" y2="{bleed}" stroke="{border_color}" stroke-width="0.5"/>')
-        svg_parts.append(f'<line x1="{bleed}" y1="{bleed - crop_mark_offset}" x2="{bleed}" y2="{bleed - crop_mark_offset - crop_mark_length}" stroke="{border_color}" stroke-width="0.5"/>')
-        # Top-right
-        svg_parts.append(f'<line x1="{total_width - bleed + crop_mark_offset}" y1="{bleed}" x2="{total_width - bleed + crop_mark_offset + crop_mark_length}" y2="{bleed}" stroke="{border_color}" stroke-width="0.5"/>')
-        svg_parts.append(f'<line x1="{total_width - bleed}" y1="{bleed - crop_mark_offset}" x2="{total_width - bleed}" y2="{bleed - crop_mark_offset - crop_mark_length}" stroke="{border_color}" stroke-width="0.5"/>')
-        # Bottom-left
-        svg_parts.append(f'<line x1="{bleed - crop_mark_offset}" y1="{total_height - bleed}" x2="{bleed - crop_mark_offset - crop_mark_length}" y2="{total_height - bleed}" stroke="{border_color}" stroke-width="0.5"/>')
-        svg_parts.append(f'<line x1="{bleed}" y1="{total_height - bleed + crop_mark_offset}" x2="{bleed}" y2="{total_height - bleed + crop_mark_offset + crop_mark_length}" stroke="{border_color}" stroke-width="0.5"/>')
-        # Bottom-right
-        svg_parts.append(f'<line x1="{total_width - bleed + crop_mark_offset}" y1="{total_height - bleed}" x2="{total_width - bleed + crop_mark_offset + crop_mark_length}" y2="{total_height - bleed}" stroke="{border_color}" stroke-width="0.5"/>')
-        svg_parts.append(f'<line x1="{total_width - bleed}" y1="{total_height - bleed + crop_mark_offset}" x2="{total_width - bleed}" y2="{total_height - bleed + crop_mark_offset + crop_mark_length}" stroke="{border_color}" stroke-width="0.5"/>')
+    add_crop_marks(svg_parts, bleed, total_width, total_height, border_color)
 
     # Build complete SVG
+    svg = f'''<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="{total_width}pt" height="{total_height}pt"
+     viewBox="0 0 {total_width} {total_height}">
+  <style>
+    text {{ font-family: Arial, sans-serif; }}
+  </style>
+  <rect width="{total_width}" height="{total_height}" fill="white"/>
+  {''.join(svg_parts)}
+</svg>'''
+
+    return svg
+
+
+def generate_calendar_svg_weekday(year: int, page_width: float = None, page_height: float = None,
+                                  bleed: float = 0) -> str:
+    """Generate SVG calendar with one row per weekday and one column per week."""
+
+    # Configuration
+    base_cell_width = 80
+    base_cell_height = 80
+    row_label_width = 60
+    header_height = 40
+    margin = 20
+
+    # Colors
+    border_color = "#000000"
+    text_color = "#000000"
+    month_line_color = "#666666"
+    month_colors = [
+        "#F6D6D6", "#F6E2D6", "#F6F0D6", "#E8F6D6",
+        "#D6F6E3", "#D6F1F6", "#D6E3F6", "#E1D6F6",
+        "#F1D6F6", "#F6D6E7", "#E6E6E6", "#DDE7D7",
+    ]
+
+    # Labels
+    dow_labels = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+    month_names = ['jan', 'feb', 'mar', 'apr', 'may', 'jun',
+                   'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+
+    year_start = date(year, 1, 1)
+    year_end = date(year, 12, 31)
+    grid_start = year_start - timedelta(days=year_start.weekday())
+    grid_end = year_end + timedelta(days=(6 - year_end.weekday()))
+    total_weeks = ((grid_end - grid_start).days + 1) // 7
+
+    if page_width and page_height:
+        natural_width = margin + row_label_width + (total_weeks * base_cell_width) + margin
+        natural_height = margin + header_height + (7 * base_cell_height) + margin
+
+        scale_w = page_width / natural_width
+        scale_h = page_height / natural_height
+        scale = min(scale_w, scale_h, 1.0)
+
+        cell_width = base_cell_width * scale
+        cell_height = base_cell_height * scale
+        row_label_width_scaled = row_label_width * scale
+        header_height_scaled = header_height * scale
+        margin_scaled = margin * scale
+    else:
+        cell_width = base_cell_width
+        cell_height = base_cell_height
+        row_label_width_scaled = row_label_width
+        header_height_scaled = header_height
+        margin_scaled = margin
+        scale = 1.0
+
+    calendar_width = margin_scaled + row_label_width_scaled + (total_weeks * cell_width) + margin_scaled
+    calendar_height = margin_scaled + header_height_scaled + (7 * cell_height) + margin_scaled
+
+    if page_width and page_height:
+        total_width = page_width + (2 * bleed)
+        total_height = page_height + (2 * bleed)
+        offset_x = bleed + (page_width - calendar_width) / 2
+        offset_y = bleed
+    else:
+        total_width = calendar_width
+        total_height = calendar_height
+        offset_x = 0
+        offset_y = 0
+
+    svg_parts = []
+
+    header_y = offset_y + margin_scaled + (20 * scale)
+    font_size_day = max(4, min(10, cell_width / 8))
+    font_size_month = max(8, int(12 * scale))
+    font_size_row = max(10, int(14 * scale))
+    padding = max(2, cell_width * 0.08)
+    day_y_offset = max(font_size_day * 1.1, cell_height * 0.15)
+
+    # Week columns and month markers
+    month_starts = {
+        date(year, month_num, 1): month_names[month_num - 1]
+        for month_num in range(1, 13)
+    }
+    for week_idx in range(total_weeks):
+        week_start = grid_start + timedelta(days=week_idx * 7)
+        x = offset_x + margin_scaled + row_label_width_scaled + (week_idx * cell_width)
+
+        for day_offset in range(7):
+            current_day = week_start + timedelta(days=day_offset)
+            if current_day in month_starts:
+                label_x = x + (cell_width / 2)
+                svg_parts.append(
+                    f'<text x="{label_x}" y="{header_y}" '
+                    f'text-anchor="middle" font-size="{font_size_month}" fill="{text_color}">{month_starts[current_day]}</text>'
+                )
+                svg_parts.append(
+                    f'<line x1="{x}" y1="{offset_y + margin_scaled + header_height_scaled * 0.35}" '
+                    f'x2="{x}" y2="{offset_y + margin_scaled + header_height_scaled + (7 * cell_height)}" '
+                    f'stroke="{month_line_color}" stroke-width="0.75"/>'
+                )
+                break
+
+    y_pos = margin_scaled + header_height_scaled
+    for weekday_idx, label in enumerate(dow_labels):
+        row_y = offset_y + y_pos + (weekday_idx * cell_height)
+
+        svg_parts.append(
+            f'<text x="{offset_x + margin_scaled}" y="{row_y + cell_height/2 + (5 * scale)}" '
+            f'font-size="{font_size_row}" fill="{text_color}">{label}</text>'
+        )
+
+        for week_idx in range(total_weeks):
+            current_day = grid_start + timedelta(days=(week_idx * 7) + weekday_idx)
+            x = offset_x + margin_scaled + row_label_width_scaled + (week_idx * cell_width)
+
+            if year_start <= current_day <= year_end:
+                bg_color = month_colors[current_day.month - 1]
+                svg_parts.append(
+                    f'<rect x="{x}" y="{row_y}" width="{cell_width}" height="{cell_height}" '
+                    f'fill="{bg_color}" stroke="{border_color}" stroke-width="1"/>'
+                )
+                svg_parts.append(
+                    f'<text x="{x + cell_width - padding}" y="{row_y + day_y_offset}" '
+                    f'text-anchor="end" font-size="{font_size_day:.1f}" fill="{text_color}">{current_day.day}</text>'
+                )
+
+    add_crop_marks(svg_parts, bleed, total_width, total_height, border_color)
+
     svg = f'''<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg"
      width="{total_width}pt" height="{total_height}pt"
@@ -401,8 +532,8 @@ def main():
     parser.add_argument('--bleed', type=float, default=None,
                         help='Bleed area in mm (default: 3mm for PDF with --a2/--a4, 0 otherwise)')
     parser.add_argument('--layout', type=str, default='continuous',
-                        choices=['continuous', 'grid'],
-                        help='Calendar layout: continuous (default, days flow by weekday) or grid (all months start at column 1, show day-of-week letters)')
+                        choices=['continuous', 'grid', 'weekday'],
+                        help='Calendar layout: continuous (default, days flow by weekday), grid (all months start at column 1, show day-of-week letters), or weekday (one row per weekday, one column per week)')
 
     args = parser.parse_args()
 
@@ -437,12 +568,14 @@ def main():
     else:
         ext = 'pdf' if args.pdf else 'svg'
         suffix = f'-{page_name}' if page_name else ''
-        layout_suffix = '-grid' if args.layout == 'grid' else ''
+        layout_suffix = '' if args.layout == 'continuous' else f'-{args.layout}'
         output_file = f'calendar-{args.year}{suffix}{layout_suffix}.{ext}'
 
     # Generate calendar with the chosen layout
     if args.layout == 'grid':
         svg_content = generate_calendar_svg_grid(args.year, page_width, page_height, bleed_points)
+    elif args.layout == 'weekday':
+        svg_content = generate_calendar_svg_weekday(args.year, page_width, page_height, bleed_points)
     else:
         svg_content = generate_calendar_svg(args.year, page_width, page_height, bleed_points)
 
